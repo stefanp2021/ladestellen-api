@@ -1,4 +1,3 @@
-#### Import all Packages
 import json
 import pathlib
 import re
@@ -54,7 +53,7 @@ boolx=True
 counter = 0
 
 #### Hier werden jetzt die Stationen ausgelesen, pro Land und Operator
-if boolx == True:
+if boolx == False:
     for i in get_operatorId_AT:
         #urlop = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}'.format(cAT = countryID_AT,operator_id=str(i))
         urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(i))
@@ -77,10 +76,19 @@ print(counter)
 
 print("---------------------------------------------------------------")
 ### GER Url
-data_set_GER = requests.get(url_GER, headers=headers, auth=auth).json()
-df_Operator_GER = json_normalize(data_set_GER)
-header_info_GER = (df_Operator_GER.columns)
-get_operatorId_GER = list(df_Operator_GER[header_info_GER[0]])
-print(get_operatorId_GER)
+#data_set_GER = requests.get(url_GER, headers=headers, auth=auth).json()
+#df_Operator_GER = json_normalize(data_set_GER)
+#header_info_GER = (df_Operator_GER.columns)
+#get_operatorId_GER = list(df_Operator_GER[header_info_GER[0]])
+#print(get_operatorId_GER)
 
 
+#### Provider
+
+
+#urlprovider ='https://api.e-control.at/charge/1.0/countries/{cAT}/providers'.format(cAT=countryID_AT)
+#print(urlprovider)
+#data_op_Pro = requests.get(urlprovider, headers=headers, auth=auth).json()
+#df_Pro_AUT = json_normalize(data_op_Pro)
+#print(df_Pro_AUT.shape)
+#print("-------------------------------------------------------")
