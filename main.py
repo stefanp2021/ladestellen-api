@@ -19,14 +19,13 @@ from pathlib import Path
 
 countryID_AT = 'AT'
 countryID_GER = 'DE'
+bezeichner_op="Operater_id"
 
 keyfile=open('ladestellen-apikey.txt')
 API_KEY = keyfile.readline().rstrip()
 #url = 'https://api.e-control.at/charge/1.0/search?capacity={cap}&latitude={lat}&longitude={long}'.format(cap=capacity,lat=latitude,long=longitude)
 url_AT = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators'.format(cAT=countryID_AT)
 url_GER = 'https://api.e-control.at/charge/1.0/countries/{cGER}/operators'.format(cGER=countryID_GER)
-
-
 
 print(url_AT)
 headers = {'Accept': 'application/json',}
@@ -39,42 +38,100 @@ header_info_AT = (df_Operator_AT.columns)
 
 get_operatorId_AT = list(df_Operator_AT[header_info_AT[0]])
 
-#print(df_Operator_AT)
-print(get_operatorId_AT)
+###### Create new Table for adresses with the same name as from API
+print("#####---------------#################################--------------------------")
+location = header_info_AT[10:13]
 
+PLZ = location[0]
+Ort = location[1]
+Straße = location[2]
+#bezeichner_adress = [PLZ,Ort,Straße]
+#df_table_adress = pd.DataFrame(columns=bezeichner_adress)
+df_table_adress = df_Operator_AT[[PLZ,Ort,Straße]]
+
+#print(df_Operator_AT)
+#print(get_operatorId_AT)
+#print(df_table_adress)
 df_Operator_AUT_CSV = df_Operator_AT.iloc[0:2,:]
 
-print(df_Operator_AUT_CSV)
+#print(df_Operator_AUT_CSV)
+
+
 ##### Save csv test
 filepath = Path('output/Operator_AUT.csv')
 df_Operator_AUT_CSV.to_csv(filepath, header=True, index=True)
 
+
+print("---------------#################################--------------------------")
+
+### To be able to turn it off
 boolx=True
 counter = 0
+waste_op_id = []
 
 #### Hier werden jetzt die Stationen ausgelesen, pro Land und Operator
-if boolx == False:
+if boolx == True:
     for i in get_operatorId_AT:
-        #urlop = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}'.format(cAT = countryID_AT,operator_id=str(i))
+        #counter = counter + 1
+        #if counter == 20:
+            #print(i)
+            #print(counter)
+            ### Just work with 1 to see if it works in general
+            #if counter == 20:
         urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(i))
-        counter = counter + 1
+
         #print(urlop)
         data_op_LS = requests.get(urlstation, headers=headers, auth=auth).json()
         df_LS_AUT = json_normalize(data_op_LS)
 
-        if (counter == 25):
-            print(df_LS_AUT.shape)
-            print(df_LS_AUT)
-            ##### Save csv test
-            filepath_LS = Path('output/Station_AUT.csv')
-            df_LS_AUT.to_csv(filepath_LS, header=True, index=True)
-print(counter)
+        #print(df_LS_AUT)
+
+        df_shape_column_AUT = df_LS_AUT.shape[0]
+        list_op_Station = [i for x in range(int(df_shape_column_AUT))]
+
+        #print(df_LS_AUT)
+        df_LS_AUT[bezeichner_op] = list_op_Station
+        #print(df_LS_AUT)
+        df_column_names = list(df_LS_AUT.columns)
+        #print(df_column_names)
+
+    
+        ##### Now fill the whole df_table_adress with the adresses from the organizer first
+        ##### But some Operators are empty
+        if(df_LS_AUT.empty == True):
+            waste_op_id.append(i)
+        else:
+            df_table_station_Adress = df_LS_AUT[[PLZ,Ort,Straße]]
+
+            frames = [df_table_adress,df_table_station_Adress]
+            df_table_adress = pd.concat(frames)
+
+        #print(df_shape_column_AUT)
+        #if (counter == 25):
+        #    print(df_LS_AUT.shape)
+        #    print(df_LS_AUT)
+        #    ##### Save csv test
+            #  filepath_LS = Path('output/Station_AUT.csv')
+            #df_LS_AUT.to_csv(filepath_LS, header=True, index=True)
+    #print(counter)
+
+##### Now drop duplicates
+df_final_adresses = df_table_adress.drop_duplicates()
+df_final_adresses.reset_index(inplace = True, drop=True)
+print(df_final_adresses)
+df_prepare_PLZ_City = df_final_adresses[[PLZ,Ort]]
+df_final_PLZ_City = df_prepare_PLZ_City.drop_duplicates()
+df_final_PLZ_City.reset_index(inplace=True,drop=True)
+print(df_final_PLZ_City)
 
 
-
-
+filepath_Adresse = Path('output/Adresse_AUT.csv')
+df_final_adresses.to_csv(filepath_Adresse, header=True, index=False)
+filepath_PLZ = Path('output/PLZ_AUT.csv')
+df_final_PLZ_City.to_csv(filepath_PLZ, header=True, index=False)
 
 print("---------------------------------------------------------------")
+print(waste_op_id)
 ### GER Url
 #data_set_GER = requests.get(url_GER, headers=headers, auth=auth).json()
 #df_Operator_GER = json_normalize(data_set_GER)
@@ -93,3 +150,6 @@ print("---------------------------------------------------------------")
 #df_Pro_AUT = json_normalize(data_op_Pro)
 #print(df_Pro_AUT)
 #print("-------------------------------------------------------")
+
+
+#print(df_Operator_AUT_CSV.iloc[:,9:17])
