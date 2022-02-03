@@ -63,7 +63,7 @@ get_operatorId = list(test[header_info[0]])
 boolx=False
 counter = 0
 
-if boolx == True:
+if boolx == False:
     for i in get_operatorId:
         urlop = 'https://api.e-control.at/charge/1.0/countries/AT/operators/{operator_id}'.format(operator_id=str(i))
         counter = counter +1
