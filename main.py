@@ -47,7 +47,7 @@ df_Operator_AUT_CSV = df_Operator_AT.iloc[0:2,:]
 
 print(df_Operator_AUT_CSV)
 ##### Save csv test
-filepath = Path('Operator_AUT.csv')
+filepath = Path('output/Operator_AUT.csv')
 df_Operator_AUT_CSV.to_csv(filepath, header=True, index=True)
 
 boolx=True
@@ -67,7 +67,7 @@ if boolx == True:
             print(df_LS_AUT.shape)
             print(df_LS_AUT)
             ##### Save csv test
-            filepath_LS = Path('Station_AUT.csv')
+            filepath_LS = Path('output/Station_AUT.csv')
             df_LS_AUT.to_csv(filepath_LS, header=True, index=True)
 print(counter)
 
