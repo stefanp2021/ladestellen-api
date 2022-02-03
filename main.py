@@ -86,10 +86,10 @@ print("---------------------------------------------------------------")
 #### Provider
 
 
-urlprovider ='https://api.e-control.at/charge/1.0/countries/{cAT}/providers'.format(cAT=countryID_AT)
-print(urlprovider)
-data_op_Pro = requests.get(urlprovider, headers=headers, auth=auth).json()
-print(data_op_Pro)
+#urlprovider ='https://api.e-control.at/charge/1.0/countries/{cAT}/providers'.format(cAT=countryID_AT)
+#print(urlprovider)
+#data_op_Pro = requests.get(urlprovider, headers=headers, auth=auth).json()
+#print(data_op_Pro)
 #df_Pro_AUT = json_normalize(data_op_Pro)
 #print(df_Pro_AUT)
 #print("-------------------------------------------------------")
