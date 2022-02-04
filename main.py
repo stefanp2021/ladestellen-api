@@ -13,6 +13,10 @@ import pandas as pd
 from pandas import json_normalize
 from pathlib import Path
 
+from dataclasses import dataclass
+import mysql.connector
+
+
 #import pymysql
 #import sqlconnection
 
@@ -148,26 +152,27 @@ print(df_final_PLZ_City)
 #df_final_PLZ_City.to_csv(filepath_PLZ, header=True, index=False)
 
 
-from dataclasses import dataclass
-import mysql.connector
+sql_up = False
 
-mydb = mysql.connector.connect(
-    host="dev.muenzer.at",
-    user="ladestellen",
-    password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
-    database="ladestellen"
-)
 
-mycursor = mydb.cursor()
-sql = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+if sql_up == True:
+    mydb = mysql.connector.connect(
+        host="dev.muenzer.at",
+        user="ladestellen",
+        password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+        database="ladestellen"
+    )
 
-for i in range(df_final_PLZ_City.shape[0]):
-    data_row = df_final_PLZ_City.iloc[i,:]
+    mycursor = mydb.cursor()
+    sql = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
 
-    val = (data_row[2], data_row[1], data_row[0])
-    mycursor.execute(sql,val)
+    for i in range(df_final_PLZ_City.shape[0]):
+        data_row = df_final_PLZ_City.iloc[i,:]
 
-mydb.commit()
+        val = (data_row[2], data_row[1], data_row[0])
+        mycursor.execute(sql,val)
 
-#print(mycursor.rowcount, "record inserted.")
+    mydb.commit()
+
+    #print(mycursor.rowcount, "record inserted.")
 
