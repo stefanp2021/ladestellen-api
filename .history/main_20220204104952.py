@@ -1,5 +1,4 @@
 import json
-from multiprocessing.spawn import import_main_path
 import pathlib
 import re
 from xml.etree.ElementInclude import include
@@ -10,7 +9,6 @@ from pandas import json_normalize
 from pathlib import Path
 #import mysql.connector
 import pymysql
-import sqlconnection
 
 #capacity = 10#input("Enter your capacity: ")
 #latitude = 47.104496# input("Enter your latitude: ")
@@ -165,5 +163,12 @@ print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 #print(df_Operator_AUT_CSV.iloc[:,9:17])
 
 
+''' mydb = mysql.connector.connect(
+  host="192.168.10.21:3306", #dev.muenzer.at #192.168.10.21, board 3306
+  #host="192.168.10.21",
+  user="root",
+  password="db-Root2021!"
+) '''
 
 
+%include sqlconnection.py

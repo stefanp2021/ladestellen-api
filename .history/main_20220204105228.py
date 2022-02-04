@@ -165,5 +165,10 @@ print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 #print(df_Operator_AUT_CSV.iloc[:,9:17])
 
 
-
+''' mydb = mysql.connector.connect(
+  host="192.168.10.21:3306", #dev.muenzer.at #192.168.10.21, board 3306
+  #host="192.168.10.21",
+  user="root",
+  password="db-Root2021!"
+) '''
 
