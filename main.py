@@ -7,6 +7,8 @@ import requests
 import pandas as pd
 from pandas import json_normalize
 from pathlib import Path
+import mysql.connector
+import pymysql
 
 #capacity = 10#input("Enter your capacity: ")
 #latitude = 47.104496# input("Enter your latitude: ")
@@ -38,16 +40,19 @@ header_info_AT = (df_Operator_AT.columns)
 
 get_operatorId_AT = list(df_Operator_AT[header_info_AT[0]])
 
+
 ###### Create new Table for adresses with the same name as from API
 print("#####---------------#################################--------------------------")
-location = header_info_AT[10:13]
-
-PLZ = location[0]
-Ort = location[1]
-Straße = location[2]
+location = header_info_AT[9:13]
+print(location)
+print(header_info_AT)
+country = location[0]
+PLZ = location[1]
+Ort = location[2]
+Straße = location[3]
 #bezeichner_adress = [PLZ,Ort,Straße]
 #df_table_adress = pd.DataFrame(columns=bezeichner_adress)
-df_table_adress = df_Operator_AT[[PLZ,Ort,Straße]]
+df_table_adress = df_Operator_AT[[country,PLZ,Ort,Straße]]
 
 #print(df_Operator_AT)
 #print(get_operatorId_AT)
@@ -58,14 +63,14 @@ df_Operator_AUT_CSV = df_Operator_AT.iloc[0:2,:]
 
 
 ##### Save csv test
-filepath = Path('output/Operator_AUT.csv')
-df_Operator_AUT_CSV.to_csv(filepath, header=True, index=True)
+    #filepath = Path('output/Operator_AUT.csv')
+    #df_Operator_AUT_CSV.to_csv(filepath, header=True, index=True)
 
 
-print("---------------#################################--------------------------")
+print("#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-##-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-##---------------------------")
 
 ### To be able to turn it off
-boolx=True
+boolx=False
 counter = 0
 waste_op_id = []
 
@@ -115,20 +120,23 @@ if boolx == True:
             #df_LS_AUT.to_csv(filepath_LS, header=True, index=True)
     #print(counter)
 
+
 ##### Now drop duplicates
 df_final_adresses = df_table_adress.drop_duplicates()
 df_final_adresses.reset_index(inplace = True, drop=True)
 print(df_final_adresses)
-df_prepare_PLZ_City = df_final_adresses[[PLZ,Ort]]
+
+###### Now we have to insert all IDs from the table_PLZ to match the ID in Adress
+df_prepare_PLZ_City = df_final_adresses[[country,PLZ,Ort]]
 df_final_PLZ_City = df_prepare_PLZ_City.drop_duplicates()
 df_final_PLZ_City.reset_index(inplace=True,drop=True)
 print(df_final_PLZ_City)
 
 
-filepath_Adresse = Path('output/Adresse_AUT.csv')
-df_final_adresses.to_csv(filepath_Adresse, header=True, index=False)
-filepath_PLZ = Path('output/PLZ_AUT.csv')
-df_final_PLZ_City.to_csv(filepath_PLZ, header=True, index=False)
+#filepath_Adresse = Path('output/Adresse_AUT.csv')
+#df_final_adresses.to_csv(filepath_Adresse, header=True, index=False)
+#filepath_PLZ = Path('output/PLZ_AUT.csv')
+#df_final_PLZ_City.to_csv(filepath_PLZ, header=True, index=False)
 
 print("---------------------------------------------------------------")
 print(waste_op_id)
@@ -149,7 +157,18 @@ print(waste_op_id)
 #print(data_op_Pro)
 #df_Pro_AUT = json_normalize(data_op_Pro)
 #print(df_Pro_AUT)
-#print("-------------------------------------------------------")
+print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 
 
 #print(df_Operator_AUT_CSV.iloc[:,9:17])
+
+
+mydb = mysql.connector.connect(
+  host="192.168.10.21:3306", #dev.muenzer.at #192.168.10.21, board 3306
+  #host="192.168.10.21",
+  user="root",
+  password="db-Root2021!"
+)
+
+#conn = pymysql.connect(db='ladestellen',user='root',passwd='db-Root2021!',host='192.168.10.21')
+print(mydb)
