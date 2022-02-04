@@ -147,62 +147,6 @@ print(df_final_PLZ_City)
 #filepath_PLZ = Path('output/PLZ_AUT.csv')
 #df_final_PLZ_City.to_csv(filepath_PLZ, header=True, index=False)
 
-print("---------------------------------------------------------------")
-print(waste_op_id)
-### GER Url
-#data_set_GER = requests.get(url_GER, headers=headers, auth=auth).json()
-#df_Operator_GER = json_normalize(data_set_GER)
-#header_info_GER = (df_Operator_GER.columns)
-#get_operatorId_GER = list(df_Operator_GER[header_info_GER[0]])
-#print(get_operatorId_GER)
-
-
-#### Provider
-
-
-#urlprovider ='https://api.e-control.at/charge/1.0/countries/{cAT}/providers'.format(cAT=countryID_AT)
-#print(urlprovider)
-#data_op_Pro = requests.get(urlprovider, headers=headers, auth=auth).json()
-#print(data_op_Pro)
-#df_Pro_AUT = json_normalize(data_op_Pro)
-#print(df_Pro_AUT)
-print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
-
-#%sqlconnection.py
-#print(df_Operator_AUT_CSV.iloc[:,9:17])
-
-#print(sqlconnection.conn)
-
-
-
-#cur = sqlconnection.conn.cursor()
-#cur.execute("SELECT")
-
-
-
-print("!!!!!!!!!!!!!!!!!!!!!!!!!!--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
-
-
-"""
-#import pymysql
-from sqlalchemy import create_engine
-
-database_username = 'ladestellen'
-database_password = 'ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT'
-database_ip       = '192.168.10.21'
-database_name     = 'ladestellen'
-
-
-
-engine = create_engine('mysql+pymysql://{0}:{1}@{2}/{3}'.format(database_username, database_password,database_ip, database_name))
-
-df_final_PLZ_City.to_sql('tbl_plz3', con = engine, if_exists = 'append', chunksize = 1000, index=True)
-
-print(df_final_PLZ_City)
-
-"""
-
-
 
 from dataclasses import dataclass
 import mysql.connector
@@ -226,27 +170,4 @@ for i in range(df_final_PLZ_City.shape[0]):
 mydb.commit()
 
 #print(mycursor.rowcount, "record inserted.")
-
-
-
-"""for i in range(df_final_PLZ_City.shape[0]):
-    data_row = df_final_PLZ_City.iloc[i,:]
-
-    val = (data_row[2], data_row[1], data_row[0])
-    print(val)
-"""
-print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
-print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
-print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
-# create sqlalchemy engine
-#dim_database = df_final_PLZ_City.shape
-#dim_rows = dim_database[0]
-
-#c = 
-#print(c)
-#print(c[0])
-#for j in :
-#    print(j)
-
-
 
