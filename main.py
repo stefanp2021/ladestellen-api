@@ -1,4 +1,4 @@
-from curses import meta
+#from curses import meta
 from importlib.metadata import metadata
 import json
 from multiprocessing.spawn import import_main_path
@@ -17,7 +17,7 @@ from pathlib import Path
 #import sqlconnection
 
 import sqlalchemy
-#from sqlalchemy import create_engine #, select, MetaData, Table, and_
+from sqlalchemy import create_engine, select, MetaData, Table, and_
 
 #capacity = 10#input("Enter your capacity: ")
 #latitude = 47.104496# input("Enter your latitude: ")
@@ -171,7 +171,7 @@ print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 #%sqlconnection.py
 #print(df_Operator_AUT_CSV.iloc[:,9:17])
 
-print(sqlconnection.conn)
+#print(sqlconnection.conn)
 
 
 
@@ -184,28 +184,38 @@ print("!!!!!!!!!!!!!!!!!!!!!!!!!!--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---
 
 
 
+#import pymysql
+from sqlalchemy import create_engine
 
 database_username = 'ladestellen'
 database_password = 'ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT'
-database_ip       = '192.168.10.21:3306'
+database_ip       = '192.168.10.21'
 database_name     = 'ladestellen'
 
-#database_connection = sqlalchemy.create_engine('mysql+mysqlconnector:)
 
-#new_engine = create_engine("dburl://{0}:{1}@{2}/{3}".format(database_username, database_password,database_ip, database_name))
-#table = Table("tbl_plz", metadata,autoload=True,autoload_with=new_engine)
-#print(table)
+"""
+engine = create_engine('mysql+pymysql://{0}:{1}@{2}/{3}'.format(database_username, database_password,database_ip, database_name))
 
-#print(database_connection)
-#df_final_PLZ_City.to_sql(con=database_connection, name='tbl_plz')
-#df = pd.read_sql_query('SELECT * FROM "tbl_addr"',con=database_connection)
-#print(df)
-#print(database_connection)
-##### Now write all sql values
+df_final_PLZ_City.to_sql('tbl_plz3', con = engine, if_exists = 'append', chunksize = 1000, index=True)
 
-#with sqlconnection.conn:
-#    with  sqlconnection.conn.cursor() as cursor:
-#        # Create a new record
-#        sql = "INSERT INTO 'tbl_plz' ('city', 'postCode','country') VALUES (%s, %s)"
-#        cursor.execute(sql, ('webmaster@python.org', 'very-secret'))
+print(df_final_PLZ_City)
+
+"""
+
+
+
+
+# Connect to the database
+#connection = pymysql.connect(host='{dip}'.format(dip=database_ip),
+#                         user='{du}'.format(du=database_username),
+#                         password='{dp}'.format(database_password),
+#                         db='{dn}'.format(database_username))
+
+# create cursor
+#cursor=connection.cursor()
+
+# import the module
+
+
+# create sqlalchemy engine
 
