@@ -183,7 +183,7 @@ print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 
 
-
+"""
 #import pymysql
 from sqlalchemy import create_engine
 
@@ -193,7 +193,7 @@ database_ip       = '192.168.10.21'
 database_name     = 'ladestellen'
 
 
-"""
+
 engine = create_engine('mysql+pymysql://{0}:{1}@{2}/{3}'.format(database_username, database_password,database_ip, database_name))
 
 df_final_PLZ_City.to_sql('tbl_plz3', con = engine, if_exists = 'append', chunksize = 1000, index=True)
@@ -204,18 +204,49 @@ print(df_final_PLZ_City)
 
 
 
+from dataclasses import dataclass
+import mysql.connector
 
-# Connect to the database
-#connection = pymysql.connect(host='{dip}'.format(dip=database_ip),
-#                         user='{du}'.format(du=database_username),
-#                         password='{dp}'.format(database_password),
-#                         db='{dn}'.format(database_username))
+mydb = mysql.connector.connect(
+    host="dev.muenzer.at",
+    user="ladestellen",
+    password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+    database="ladestellen"
+)
 
-# create cursor
-#cursor=connection.cursor()
+mycursor = mydb.cursor()
+sql = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
 
-# import the module
+for i in range(df_final_PLZ_City.shape[0]):
+    data_row = df_final_PLZ_City.iloc[i,:]
+
+    val = (data_row[2], data_row[1], data_row[0])
+    mycursor.execute(sql,val)
+
+mydb.commit()
+
+#print(mycursor.rowcount, "record inserted.")
 
 
+
+"""for i in range(df_final_PLZ_City.shape[0]):
+    data_row = df_final_PLZ_City.iloc[i,:]
+
+    val = (data_row[2], data_row[1], data_row[0])
+    print(val)
+"""
+print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
+print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
+print("--*-*-***-**-*-+-+--+-++-*-+++++-*****---**+---**-------------------")
 # create sqlalchemy engine
+#dim_database = df_final_PLZ_City.shape
+#dim_rows = dim_database[0]
+
+#c = 
+#print(c)
+#print(c[0])
+#for j in :
+#    print(j)
+
+
 
