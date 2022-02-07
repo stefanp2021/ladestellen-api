@@ -140,5 +140,8 @@ print('------------------------')
 
 #print(df_Ladestationen_Station_Whole)
 
-filepath_Adresse = Path('output/Station_Whole.csv')
-df_Ladestationen_Station_Whole.to_csv(filepath_Adresse, header=True, index=False)
+df_Ladestationen_Station_Whole.reset_index(inplace=True,drop=True)
+
+print(df_Ladestationen_Station_Whole)
+#filepath_Adresse = Path('output/Station_Whole.csv')
+#df_Ladestationen_Station_Whole.to_csv(filepath_Adresse, header=True, index=False)
