@@ -94,6 +94,9 @@ waste_op_id = []
 
 print(df_Ladestationen_Station_Whole)
 
+##################################################################################################################################################################
+""" HERE we start filling the PLZ Table in MySQL which is the Base for other implementations """
+##################################################################################################################################################################
 
 ### Now we can add all other stations
 for i in get_operatorId_AT:
@@ -282,9 +285,9 @@ for i in range(df_table_adress_Station.shape[0]):
                         #print("{pc} | {cit} already existing".format(pc = pC, cit=City))
                         pass
                     else:
-                        print("Post: "+pC)
-                        print("Ort: "+City)
-                        print('------')
+                        #print("Post: "+pC)
+                        #print("Ort: "+City)
+                        #print('------')
 
                         boolDigit = pC.startswith('-') and pC[1:].isdigit()
                         boolTextDigit = City.isdigit()
@@ -295,6 +298,33 @@ for i in range(df_table_adress_Station.shape[0]):
                             val_1 = (City, pC, land)
                             mycursor_1.execute(sql_1,val_1)
                         else:
-                            print("Something went wrong with {a}, {b}".format(a=pC, b=City))
+                            print("Something went wrong with {a}, {b} before".format(a=pC, b=City))
+                            #Now for the rest witch doesn't fit anywhere
+                            #Abfrage ob es bereits existiert
+                            
+                            mycursor_Rest = mydb.cursor()
+                            sql_Rest = "SELECT * FROM tbl_plz WHERE city=%s and postCode=%s and country=%s"
+                            val_Rest = (City,pC,land)
+                            mycursor_Rest.execute(sql_Rest,val_Rest)
+                            myresult_Rest = mycursor_Rest.fetchall()
+                            if(len(myresult_Rest)) != 0:
+                                print("However it is in Database and functionally")
+                                pass
+                            else:
+                                print("But it is fixed now")
+                                mycursor_RestInsert = mydb.cursor()
+                                sql_RestInsert = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+                                val_RestInsert = (str(City), pC, land)
+                                mycursor_RestInsert.execute(sql_RestInsert,val_RestInsert)
 
         mydb.commit()
+
+
+
+### Now here we fill in all other Information with the PLZ-values from the SQL Database
+
+##################################################################################################################################################################
+""" START with the Operator and Station Filling in the SQL-DataBase """
+##################################################################################################################################################################
+
+
