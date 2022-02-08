@@ -360,8 +360,12 @@ mydb = mysql.connector.connect(
 def func_Insert_In_tblStreet(df_data, db_connection):
     mycursor = db_connection.cursor()
 
+    counter=0
+
     for i in range(df_data.shape[0]):
         data_row = df_data.iloc[i,:]
+
+        counter = counter + 1
 
         pC = data_row["postCode"]
         City = data_row["city"]
@@ -373,22 +377,23 @@ def func_Insert_In_tblStreet(df_data, db_connection):
         if(City is None or pC is None):
             obj_street = Street(country=land,postCode=None,location=None,street=data_street)
 
-            sql_pruefe = "SELECT * FROM tbl_adress WHERE city=%s and postCode=%s and country=%s"
-
-            sql = "SELECT PLZ_ID FROM tbl_plz WHERE city IS NULL AND postCode IS NULL"
-            mycursor.execute(sql)
-            myresult_Street = mycursor.fetchall()
-            
-            get_PLZ_ID = myresult_Street[0][0]
-            obj_street.PLZID = get_PLZ_ID
-            
-            obj_street.UpdateSQLStreet(db_connection)
-            del(obj_street)
-            #mycursor_Insert = db_connection.cursor()
-            #sql_Insert = "INSERT INTO tbl_addr (street, Plz_Id) VALUES (%s, %s)"
-            #val_Insert = ()
-            #mycursor_RestInsert.execute(sql_RestInsert,val_RestInsert)
-
+            ##Abfrage ob es das schon gibt
+            count_items_table = obj_street.AskCountStreet(connector=db_connection,booleanValue=True)
+            count_items_table_single = count_items_table[0]
+            ##Wenn existierend
+            if(count_items_table_single[0] < 1):
+                sql = "SELECT PLZ_ID FROM tbl_plz WHERE city IS NULL AND postCode IS NULL"
+                mycursor.execute(sql)
+                myresult_Street = mycursor.fetchall()
+                
+                get_PLZ_ID = myresult_Street[0][0]
+                obj_street.PLZID = get_PLZ_ID
+                
+                obj_street.UpdateSQLStreet(db_connection)
+                del(obj_street)
+            else:
+                #Existiert bereits
+                pass
 
         else:
             
@@ -398,33 +403,50 @@ def func_Insert_In_tblStreet(df_data, db_connection):
                 testpC="Nichtmoeglich"
 
             if(isinstance(testpC,int)):
+
                 obj_street = Street(country=land,postCode=pC,location=City,street=data_street)
+                #print(obj_street.street)
 
-                sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
-                val = (obj_street.location, obj_street.postCode, obj_street.country)
-                mycursor.execute(sql,val)
-                myresult_Street = mycursor.fetchall()
-                get_PLZ_ID = myresult_Street[0][0]
-                obj_street.PLZID = get_PLZ_ID
+                ##Abfrage ob es das schon gibt
+                count_items_table = obj_street.AskCountStreet(connector=db_connection,booleanValue=False)
+                count_items_table_single = count_items_table[0]
+                #print(count_items_table_single[0])
+                #print("--------------------------------------------")
 
-                obj_street.UpdateSQLStreet(db_connection)
+                if(count_items_table_single[0] < 1):
 
-                del(obj_street)
+                    sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
+                    val = (obj_street.location, obj_street.postCode, obj_street.country)
+                    mycursor.execute(sql,val)
+                    myresult_Street = mycursor.fetchall()
+                    get_PLZ_ID = myresult_Street[0][0]
+                    obj_street.PLZID = get_PLZ_ID
+
+                    obj_street.UpdateSQLStreet(db_connection)
+
+                    del(obj_street)
 
             else:
                 obj_street = Street(country=land,postCode=City,location=pC,street=data_street)
                 print("Umgedreht")
+
+                count_items_table = obj_street.AskCountStreet(connector=db_connection,booleanValue=False)
+                count_items_table_single = count_items_table[0]
+                #print(type(count_items_table_single))
+                #print(count_items_table_single[0][0])
+
+                if(count_items_table_single[0] < 1):
                 
-                sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
-                val = (obj_street.location, obj_street.postCode, obj_street.country)
-                mycursor.execute(sql,val)
-                myresult_Street = mycursor.fetchall()
-                get_PLZ_ID = myresult_Street[0][0]
-                obj_street.PLZID = get_PLZ_ID
+                    sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
+                    val = (obj_street.location, obj_street.postCode, obj_street.country)
+                    mycursor.execute(sql,val)
+                    myresult_Street = mycursor.fetchall()
+                    get_PLZ_ID = myresult_Street[0][0]
+                    obj_street.PLZID = get_PLZ_ID
 
-                obj_street.UpdateSQLStreet(db_connection)
+                    obj_street.UpdateSQLStreet(db_connection)
 
-                del(obj_street)
+                    del(obj_street)
 
         #print(myresult_Street[0][0])
         db_connection.commit()
@@ -432,7 +454,7 @@ def func_Insert_In_tblStreet(df_data, db_connection):
 
 
 func_Insert_In_tblStreet(df_table_adress_Operator, mydb)
-func_Insert_In_tblStreet(df_table_adress_Station, mydb)
+#func_Insert_In_tblStreet(df_table_adress_Station, mydb)
 
 print('-#-#-#-#-')
 

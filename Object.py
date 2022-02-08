@@ -5,6 +5,8 @@
 from itertools import count
 from turtle import st
 
+from sqlalchemy import true
+
 
 
 
@@ -23,6 +25,23 @@ class Street:
         val = (self.street,self.PLZID)
         mycursor.execute(sql,val)
         connector.commit()
+
+    def AskCountStreet(self, connector, booleanValue):
+        mycursor = connector.cursor()
+        if(booleanValue==False):
+            sql_pruefe = "SELECT COUNT(*) FROM tbl_addr WHERE street=%s" #"SELECT * FROM tbl_addr WHERE street=%s"
+            val_pruefe = (self.street,)
+            mycursor.execute(sql_pruefe,val_pruefe)
+            myresult_Street = mycursor.fetchall()
+            connector.commit()
+        else:
+            sql_pruefe = "SELECT COUNT(*) FROM tbl_addr WHERE street IS NULL" # "SELECT * FROM tbl_addr WHERE street IS NULL" 
+            mycursor.execute(sql_pruefe)
+            myresult_Street = mycursor.fetchall()
+            connector.commit()
+
+        return(myresult_Street)
+
 
     def __del__(self):
         pass
