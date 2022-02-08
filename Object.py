@@ -17,12 +17,13 @@ class Street:
         self.location = location
         self.PLZID = ""
 
-    def UpdateSQLStreet(self,connector,TabelleInto):
+    def UpdateSQLStreet(self,connector):
         mycursor = connector.cursor()
-        sql = "INSERT INTO {tab} (PLZID, street) VALUES ({a}, {b})".format(tab  = TabelleInto, a=self.PLZID,b=self.street)
-        #val = (self.PLZID, self.street)
-        mycursor.execute(sql)
+        sql = "INSERT INTO tbl_addr (street, Plz_Id) VALUES (%s, %s)"
+        val = (self.street,self.PLZID)
+        mycursor.execute(sql,val)
         connector.commit()
+
     def __del__(self):
         pass
         #Deconstrutor
