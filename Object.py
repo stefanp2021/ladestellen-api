@@ -17,12 +17,11 @@ class Street:
         self.location = location
         self.PLZID = ""
 
-    def UpdateSQLStreet(self,connector):
+    def UpdateSQLStreet(self,connector,TabelleInto):
         mycursor = connector.cursor()
-        sql = "INSERT INTO tbl_street (PLZID, street) VALUES (%s, %s)"
-
-        val = (self.PLZID, self.street)
-        mycursor.execute(sql,val)
+        sql = "INSERT INTO {tab} (PLZID, street) VALUES ({a}, {b})".format(tab  = TabelleInto, a=self.PLZID,b=self.street)
+        #val = (self.PLZID, self.street)
+        mycursor.execute(sql)
         connector.commit()
     def __del__(self):
         pass
@@ -52,9 +51,9 @@ class Operator:
         self.status = status
         self.StreetID = ""
 
-    def UpdateSQLOperator(self,connector):
+    def UpdateSQLOperator(self,connector,TabelleInto):
         mycursor = connector.cursor()
-        sql = "INSERT INTO tbl_operator (operatorId,type,organization,commercialRegisterNumber,sex,titlePrefix,firstName,lastName,titleSuffix,street,website,deviatingOperatorIds,status) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s)"
+        sql = "INSERT INTO {tab} (operatorId,type,organization,commercialRegisterNumber,sex,titlePrefix,firstName,lastName,titleSuffix,street,website,deviatingOperatorIds,status) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s)".format(tab = TabelleInto)
 
         val = (self.operatorID, self.type, self.organization,self.commercialRegisterNumber,self.sex,self.titlePrefix,self.firstName, 
         self.lastName,self.titleSuffix,self.StreetID, self.StreetID,self.website,self.deviatingOperatorIds,self.status)
@@ -93,9 +92,9 @@ class Station:
         self.Operator_ID = ""
         self.StreetID = ""
 
-    def UpdateSQLStation(self,connector):
+    def UpdateSQLStation(self,connector, TabelleInto):
         mycursor = connector.cursor()
-        sql = "INSERT INTO tbl_station (stationId,stationStatus,label,description,street,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours,openingHoursdetails,Operater_id) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s,%s)"
+        sql = "INSERT INTO {tab} (stationId,stationStatus,label,description,street,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours,openingHoursdetails,Operater_id) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s,%s)".format(tab = TabelleInto)
 
         val = (self.stationId, self.stationStatus, self.label,self.description,self.StreetID,self.latitude,self.longitude, 
         self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,

@@ -17,6 +17,7 @@ from dataclasses import dataclass
 import mysql.connector
 import copy
 
+#import Object
 from Object import Operator, Station, Street
 
 
@@ -37,7 +38,11 @@ auth = HTTPBasicAuth('stefanpirker', 'xWQ24m2z3AqKP4HcarZz',)
 
 
 
-##############################################  BLOCK Abfrage  ########################################################
+##################################################################################################################################################################
+""" HERE we are using the query's to get Information for the API """
+##################################################################################################################################################################
+
+#region GET_API_Information
 
 data_set_AT = requests.get(url_AT, headers=headers, auth=auth).json() #only AUT
 df_Operator_AT = json_normalize(data_set_AT)
@@ -92,11 +97,18 @@ waste_op_id = []
 #a = df_Operator_AT[df_Operator_AT[op_ID] == get_operatorId_AT[1] ]
 #print(a[op_Name].values[0])
 
-print(df_Ladestationen_Station_Whole)
+#print(df_Ladestationen_Station_Whole)
+
+#endregion
 
 ##################################################################################################################################################################
 """ HERE we start filling the PLZ Table in MySQL which is the Base for other implementations """
 ##################################################################################################################################################################
+
+
+"""
+
+#region Fill_PLZ_Table
 
 ### Now we can add all other stations
 for i in get_operatorId_AT:
@@ -320,11 +332,60 @@ for i in range(df_table_adress_Station.shape[0]):
         mydb.commit()
 
 
+#endregion
 
 ### Now here we fill in all other Information with the PLZ-values from the SQL Database
+"""
 
 ##################################################################################################################################################################
-""" START with the Operator and Station Filling in the SQL-DataBase """
+""" START with the Adresses Operator and Station Filling in the SQL-DataBase """
 ##################################################################################################################################################################
 
+#region FILL other SQL-DataBases
 
+## Fill table_Street first
+### First with Operator
+
+mydb = mysql.connector.connect(
+        host="dev.muenzer.at",
+        user="ladestellen",
+        password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+        database="ladestellen"
+    )
+
+mycursor = mydb.cursor()
+
+for i in range(df_table_adress_Operator.shape[0]):
+    data_row = df_table_adress_Operator.iloc[i,:]
+
+    pC = data_row["postCode"]
+    City = data_row["city"]
+    land = data_row["country"]
+    data_street = data_row["street"]
+
+    print(pC,City,land,data_street)
+
+    obj_street = Street(country=land,postCode=pC,location=City,street=data_street)
+    #sql = "SELECT PLZ_ID FROM tbl_plz WHERE city={ci} AND postCode={p} AND country={c} order by city".format(ci=(obj_street.location,), p=(obj_street.postCode,),c=(obj_street.country,))
+    #sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s"(obj_street.location, )
+    mycursor.execute('SELECT * FROM tbl_plz WHERE city={a} LIMIT 1'.format(a=obj_street.location))
+    myresult_Street = mycursor.fetchall()
+
+    """
+    if(len(myresult_Street) != 0):
+        print(myresult_Street)
+    else:
+        #Weil leider teilweise PLZ und City umgedreht
+        sql = "SELECT PLZ_ID FROM tbl_plz WHERE city={p} and postCode={ci} and country={c} order by city".format(ci=obj_street.location, p=obj_street.postCode,c=obj_street.country)
+        mycursor.execute(sql)
+        myresult_Street = mycursor.fetchall()
+        print("Umgedreht")
+        print(myresult_Street)
+    """
+
+
+#print(df_table_adress_Operator)                #--> here are all operators with streetvalue
+#print(df_table_adress_Station)                 #--> here are all operators with streetvalue
+
+
+#endregion
