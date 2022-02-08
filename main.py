@@ -1,11 +1,13 @@
 ##############################################  BLOCK Package  ########################################################
 
 
+from logging import PlaceHolder
 import os
 #os.system('Object.py')
 #from curses import meta
 from importlib.metadata import metadata
 import json
+import string
 from requests.auth import HTTPBasicAuth
 import requests
 import pandas as pd
@@ -142,6 +144,157 @@ print('------------------------')
 
 df_Ladestationen_Station_Whole.reset_index(inplace=True,drop=True)
 
-print(df_Ladestationen_Station_Whole)
+#print(df_table_adress_Station)
+#print(df_table_adress_Operator)
 #filepath_Adresse = Path('output/Station_Whole.csv')
 #df_Ladestationen_Station_Whole.to_csv(filepath_Adresse, header=True, index=False)
+
+    # And now if the SQL-Table is not empty, add at least 1 Null line 
+
+
+##### Now we add the Adresses to tbl_PLZ
+
+
+
+mydb = mysql.connector.connect(
+        host="dev.muenzer.at",
+        user="ladestellen",
+        password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+        database="ladestellen"
+    )
+
+
+## But first we need a Null entry, else it isn't possible to fill it up with that
+Null_Dataset = df_table_adress_Operator[df_table_adress_Operator[PLZ].isnull() | df_table_adress_Operator[Ort].isnull()]
+if(Null_Dataset.empty == False):
+    select_Null = Null_Dataset.iloc[0,:]
+    pC_Null = select_Null["postCode"]
+    City_Null = select_Null["city"]
+    land_Null = select_Null["country"]
+    mycursor_Null = mydb.cursor()
+    #### IF SQL-Table is empty
+    sql_Null_Count = "SELECT COUNT(*) FROM tbl_plz"
+    mycursor_Null.execute(sql_Null_Count)
+    count_result = mycursor_Null.fetchall()
+    count_result_tuple = count_result[0]
+    count_Null_select = count_result_tuple[0]
+    print(count_Null_select)
+    if count_Null_select < 1:
+        sql_Null = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+        val_Null = (City_Null, pC_Null, land_Null)
+        mycursor_Null.execute(sql_Null,val_Null)
+
+## Now we have 1 Null element we add all the others
+print('-#-#-#-#-#-#-#-#-##-#-#-#-#--#-#-#-#-##-#-#-#-#-#-#-#-#-#-#-##-#-#-#-#-#-#--#-##-#-#-#--##-#-#-#-#--##-')
+mycursor = mydb.cursor()
+sql = "SELECT * FROM tbl_plz WHERE city=%s and postCode=%s and country=%s"
+
+for i in range(df_table_adress_Operator.shape[0]):
+        data_row = df_table_adress_Operator.iloc[i,:]
+
+        pC = data_row["postCode"]
+        City = data_row["city"]
+        land = data_row["country"]
+
+        val = (City, pC,land)
+        mycursor.execute(sql,val)
+        myresult = mycursor.fetchall()
+        #print(type(myresult))
+        if(len(myresult)) != 0:
+            #print("{pc} | {cit} already existing".format(pc = pC, cit=City))
+            pass
+        else:
+            if (pC is None or City is None):
+                print("NULL is already existing")
+                print(myresult)
+            else:
+                mycursor_1 = mydb.cursor()
+                sql_1 = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+                val_1 = (City, pC, land)
+                mycursor_1.execute(sql_1,val_1)       
+
+        mydb.commit()
+
+
+### Now we add the Stations
+
+mydb = mysql.connector.connect(
+        host="dev.muenzer.at",
+        user="ladestellen",
+        password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+        database="ladestellen"
+    )
+
+print('-#-#-#-#-#-#-#-#-##-#-#-#-#--#-#-#-#-##-#-#-#-#-#-#-#-#-#-#-##-#-#-#-#-#-#--#-##-#-#-#--##-#-#-#-#--##-')
+mycursor = mydb.cursor()
+sql = "SELECT * FROM tbl_plz WHERE city=%s and postCode=%s and country=%s"
+
+for i in range(df_table_adress_Station.shape[0]):
+        data_row = df_table_adress_Station.iloc[i,:]
+
+        pC = data_row["postCode"]
+        City = data_row["city"]
+        land = data_row["country"]
+
+        val = (City, pC,land)
+        mycursor.execute(sql,val)
+        myresult_Stat = mycursor.fetchall()
+        #print(myresult_Stat)
+        #print(len(myresult_Stat))
+        #print("----")
+        if(len(myresult_Stat)) != 0:
+            #print("{pc} | {cit} already existing".format(pc = pC, cit=City))
+            pass
+        else:
+            if (pC is None or City is None):
+                print("NULL is already existing")
+                #print(myresult)
+            else:
+                #print(type(pC))
+                #print(type(City))
+                ### Now we have to look, if there is PLZ and Location switched
+
+                boolDigit = pC.startswith('-') and pC[1:].isdigit()
+                boolTextDigit = City.isdigit()
+                if(boolDigit == True or boolTextDigit==False): #and isinstance(City,string)
+                    
+                    #print("Right path Station")
+
+                    mycursor_1 = mydb.cursor()
+                    sql_1 = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+                    val_1 = (City, pC, land)
+                    mycursor_1.execute(sql_1,val_1)
+                else:
+                    
+                    #print("Right path Station but with SWITCH")
+
+                    pC = data_row["city"]
+                    City = data_row["postCode"]
+                    # Now we need to see, if the values are now correct
+
+                    #Now look if the switched version are in the sql-table
+                    mycursor_switch = mydb.cursor()
+                    sql_switch = "SELECT * FROM tbl_plz WHERE city=%s and postCode=%s and country=%s"
+                    val_switch = (City,pC,land)
+                    mycursor_switch.execute(sql_switch,val_switch)
+                    myresult_switch = mycursor_switch.fetchall()
+                    if(len(myresult_switch)) != 0:
+                        #print("{pc} | {cit} already existing".format(pc = pC, cit=City))
+                        pass
+                    else:
+                        print("Post: "+pC)
+                        print("Ort: "+City)
+                        print('------')
+
+                        boolDigit = pC.startswith('-') and pC[1:].isdigit()
+                        boolTextDigit = City.isdigit()
+
+                        if(boolDigit == True or boolTextDigit==False):#and isinstance(City,string)
+                            mycursor_1 = mydb.cursor()
+                            sql_1 = "INSERT INTO tbl_plz (city, postCode, country) VALUES (%s, %s, %s)"
+                            val_1 = (City, pC, land)
+                            mycursor_1.execute(sql_1,val_1)
+                        else:
+                            print("Something went wrong with {a}, {b}".format(a=pC, b=City))
+
+        mydb.commit()
