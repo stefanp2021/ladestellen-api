@@ -125,7 +125,7 @@ class Station:
     species = "Station Values"
     def __init__(self,stationId,stationStatus,label,description,postCode,city,street,latitude,longitude,
     contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours,openingHoursdetails,
-    Operater_id):
+    operater_id):
         self.stationId = stationId
         self.stationStatus = stationStatus
         self.label = label,
@@ -146,19 +146,37 @@ class Station:
         self.public = public
         self.openingHours = openingHours
         self.openingHoursdetails = openingHoursdetails
-        self.Operater_id = Operater_id
+        self.operater_id = operater_id
         self.Operator_ID = ""
         self.StreetID = ""
 
-    def UpdateSQLStation(self,connector, TabelleInto):
-        mycursor = connector.cursor()
-        sql = "INSERT INTO {tab} (stationId,stationStatus,label,description,street,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours,openingHoursdetails,Operater_id) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s,%s)".format(tab = TabelleInto)
 
-        val = (self.stationId, self.stationStatus, self.label,self.description,self.StreetID,self.latitude,self.longitude, 
+    def InsertSQLStation(self,connector):
+        mycursor = connector.cursor()
+        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours.text,openingHours.details) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s,%s)"
+
+        val = (self.stationId, self.operator_Id, self.stationStatus, self.label, self.description, self.StreetID,self.latitude,self.longitude, 
         self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,
         self.public,self.openingHours,self.openingHoursdetails,self.Operater_id)
         mycursor.execute(sql,val)
         connector.commit()
+
+    def ReturnStreetID(self, connector):
+        mycursor = connector.cursor()
+        if(self.street is None):
+            sql_streetid = "SELECT Adress_ID FROM tbl_addr WHERE street IS NULL"
+            mycursor.execute(sql_streetid)
+            myresult_StreetID = mycursor.fetchall()
+            connector.commit()
+        else:
+            sql_streetid = "SELECT Adress_ID FROM tbl_addr WHERE street=%s"
+            val_streetid = (self.street,)
+            mycursor.execute(sql_streetid,val_streetid)
+            myresult_StreetID = mycursor.fetchall()
+            connector.commit()
+            
+        return(myresult_StreetID)
+
     def __del__(self):
         pass
         #Deconstrutor

@@ -55,6 +55,7 @@ df_API_Operator_AUT = requests.get(url_AT, headers=headers, auth=auth).json() #o
 df_API_Operator_AUT_DataFrame = json_normalize(df_API_Operator_AUT)
 
 header_info_df_Operator = (df_API_Operator_AUT_DataFrame.columns)
+get_operatorId_AT = list(df_API_Operator_AUT_DataFrame[header_info_df_Operator[0]])
 
 df_shape_API_Operator_AUT_DataFrame = df_API_Operator_AUT_DataFrame.shape[0]
 
@@ -111,3 +112,56 @@ for i in range(df_shape_API_Operator_AUT_DataFrame):
 #endregion
 
 mydb.close()
+
+
+
+mydb = mysql.connector.connect(
+        host="dev.muenzer.at",
+        user="ladestellen",
+        password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
+        database="ladestellen"
+    )
+
+
+##################################################################################################################################################################
+""" START with the Station Filling in the SQL-DataBase """
+##################################################################################################################################################################
+
+#region
+
+for i in get_operatorId_AT:
+    urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(i))
+
+    data_op_LS = requests.get(urlstation, headers=headers, auth=auth).json()
+    df_API_Station_AUT_DataFrame = json_normalize(data_op_LS)
+    header_Station_AUT_DataFrame = list(df_API_Station_AUT_DataFrame.columns)
+
+    df_API_Station_Single = df_API_Station_AUT_DataFrame.iloc[i,:]
+
+    Stationid = df_API_Station_Single[header_Station_AUT_DataFrame[0]]
+    StationStatus = df_API_Station_Single[header_Station_AUT_DataFrame[1]]
+    Label = df_API_Station_Single[header_Station_AUT_DataFrame[2]]
+    Description = df_API_Station_Single[header_Station_AUT_DataFrame[3]]
+    PostCode = df_API_Station_Single[header_Station_AUT_DataFrame[4]]
+    City = df_API_Station_Single[header_Station_AUT_DataFrame[5]]
+    Streetdata = df_API_Station_Single[header_Station_AUT_DataFrame[6]]
+    Latitude = df_API_Station_Single[header_Station_AUT_DataFrame[7]]
+    Longitude = df_API_Station_Single[header_Station_AUT_DataFrame[8]]
+    ContactName = df_API_Station_Single[header_Station_AUT_DataFrame[9]]
+    Telephone = df_API_Station_Single[header_Station_AUT_DataFrame[10]]
+    Email = df_API_Station_Single[header_Station_AUT_DataFrame[11]]
+    Website = df_API_Station_Single[header_Station_AUT_DataFrame[12]]
+    Directions= df_API_Station_Single[header_Station_AUT_DataFrame[13]]
+    GreenEnergy= df_API_Station_Single[header_Station_AUT_DataFrame[14]]
+    FreeParking= df_API_Station_Single[header_Station_AUT_DataFrame[15]]
+    PriceUrl= df_API_Station_Single[header_Station_AUT_DataFrame[16]]
+    Public= df_API_Station_Single[header_Station_AUT_DataFrame[17]]
+    OpeningHours_text= df_API_Station_Single[header_Station_AUT_DataFrame[18]]
+    OpeningHours_details= df_API_Station_Single[header_Station_AUT_DataFrame[19]]
+
+    obj_Station = Station(stationId=Stationid, stationStatus=StationStatus,label=Label,description=Description,postCode=PostCode,city=City,
+    street=StreetData,latitude=Latitude,longitude=Longitude,contactName=ContactName,telephone=Telephone,email=Email,website=Website,directions=Directions,
+    greenEnergy=GreenEnergy,freeParking=FreeParking,priceUrl=PriceUrl,public=Public,openingHours=OpeningHours_text,openingHoursdetails=OpeningHours_details,operater_id=str(i))
+
+
+#endregion
