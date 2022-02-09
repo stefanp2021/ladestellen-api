@@ -508,24 +508,3 @@ print('-#-#-#-#-')
 
 #endregion
 
-
-
-
-##################################################################################################################################################################
-""" START with the Operator Filling in the SQL-DataBase """
-##################################################################################################################################################################
-
-#region FILL other SQL-DataBases
-
-df_API_Operator_AUT = requests.get(url_AT, headers=headers, auth=auth).json() #only AUT
-df_API_Operator_AUT_DataFrame = json_normalize(df_API_Operator_AUT)
-
-header_info_df_Operator = (df_API_Operator_AUT_DataFrame.columns)
-
-#endregion
-
-
-
-a=1
-
-
