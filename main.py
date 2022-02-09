@@ -74,6 +74,8 @@ op_ID = header_info_AT[0]
 op_Name = header_info_AT[2]
 
 df_table_adress_Operator = df_Operator_AT[[country,PLZ,Ort,Straße]]
+
+#print(df_Operator_AT[df_Operator_AT["city"] == "6556"])
 df_table_adress_Station = pd.DataFrame(columns=df_table_adress_Operator.columns)
 
 #### Hier werden jetzt die Stationen ausgelesen, pro Land und Operator --> jetzt nur AUT
@@ -110,13 +112,13 @@ waste_op_id = []
 ##################################################################################################################################################################
 
 
-"""
+
 
 #region Fill_PLZ_Table
-
+#counter = 0
 ### Now we can add all other stations
 for i in get_operatorId_AT:
-
+    #counter = counter + 1
     urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(i))
 
     data_op_LS = requests.get(urlstation, headers=headers, auth=auth).json()
@@ -137,6 +139,14 @@ for i in get_operatorId_AT:
 
     df_column_names = list(df_LS_AUT.columns)
 
+
+    #print(df_LS_AUT.loc[df_LS_AUT["city"] == "ALKOVEN"])
+    #if (df_shape_column_AUT > 0 ):
+    #    print(df_LS_AUT[["city","postCode","operatorId"]])
+    #    print(df_LS_AUT.iloc[:,-3])
+        #print(df_LS_AUT)
+
+    #    print(df_LS_AUT.loc[df_LS_AUT["city"]=="ALKOVEN"])
     ##### Now fill the whole df_table_adress with the adresses from the organizer first
     ##### But some Operators are empty
     if(df_LS_AUT.empty == True):
@@ -218,6 +228,8 @@ for i in range(df_table_adress_Operator.shape[0]):
         val = (City, pC,land)
         mycursor.execute(sql,val)
         myresult = mycursor.fetchall()
+
+
         #print(type(myresult))
         if(len(myresult)) != 0:
             #print("{pc} | {cit} already existing".format(pc = pC, cit=City))
@@ -339,10 +351,10 @@ for i in range(df_table_adress_Station.shape[0]):
 #endregion
 
 ### Now here we fill in all other Information with the PLZ-values from the SQL Database
-"""
+
 
 ##################################################################################################################################################################
-""" START with the Adresses Operator and Station Filling in the SQL-DataBase """
+""" START with the Adresses Filling in the SQL-DataBase """
 ##################################################################################################################################################################
 
 #region FILL other SQL-DataBases
@@ -385,7 +397,7 @@ def func_Insert_In_tblStreet(df_data, db_connection):
                 sql = "SELECT PLZ_ID FROM tbl_plz WHERE city IS NULL AND postCode IS NULL"
                 mycursor.execute(sql)
                 myresult_Street = mycursor.fetchall()
-                
+                print("PLZ bei None")
                 get_PLZ_ID = myresult_Street[0][0]
                 obj_street.PLZID = get_PLZ_ID
                 
@@ -400,7 +412,7 @@ def func_Insert_In_tblStreet(df_data, db_connection):
             try:
                 testpC = int(pC)
             except ValueError:
-                testpC="Nichtmoeglich"
+                testpC=str(pC)
 
             if(isinstance(testpC,int)):
 
@@ -419,6 +431,7 @@ def func_Insert_In_tblStreet(df_data, db_connection):
                     val = (obj_street.location, obj_street.postCode, obj_street.country)
                     mycursor.execute(sql,val)
                     myresult_Street = mycursor.fetchall()
+                    #print("PLZ bei normal")
                     get_PLZ_ID = myresult_Street[0][0]
                     obj_street.PLZID = get_PLZ_ID
 
@@ -427,8 +440,31 @@ def func_Insert_In_tblStreet(df_data, db_connection):
                     del(obj_street)
 
             else:
-                obj_street = Street(country=land,postCode=City,location=pC,street=data_street)
+                #Now we have to look if the Postcode is just switched with the City or they are both in the PLZ-entry
+                #print(data_row)
+                #print("City = {}".format(City))
+                #print("postCode = {}".format(pC))
+
+
+                pC_pruef = pC[0:4]
+
+                try:
+                    testpC1 = int(pC_pruef)
+                except ValueError:
+                    testpC1 =str(pC_pruef)
+
+                if(isinstance(testpC1,int)):
+                    # in some cases the PLZ and City are in the same field
+                    obj_street = Street(country=land,postCode=pC,location=City,street=data_street)
+                    #print("Should be in same field: " + obj_street.postCode)
+
+                else:
+                    #So here we have PLZ and City switched, now we reswitch it
+                    obj_street = Street(country=land,postCode=City,location=pC,street=data_street)
+                    #print("should be switched: postCode = {0}     city = {1}".format(obj_street.postCode, obj_street.location))
+
                 print("Umgedreht")
+                
 
                 count_items_table = obj_street.AskCountStreet(connector=db_connection,booleanValue=False)
                 count_items_table_single = count_items_table[0]
@@ -439,8 +475,10 @@ def func_Insert_In_tblStreet(df_data, db_connection):
                 
                     sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
                     val = (obj_street.location, obj_street.postCode, obj_street.country)
+                    #print("SELECT PLZ_ID FROM tbl_plz WHERE city={a} AND postCode={b} AND country={c}".format(a=obj_street.location, b = obj_street.postCode, c = obj_street.country))
                     mycursor.execute(sql,val)
                     myresult_Street = mycursor.fetchall()
+                    print("PLZ bei umgedreht")
                     get_PLZ_ID = myresult_Street[0][0]
                     obj_street.PLZID = get_PLZ_ID
 
@@ -453,78 +491,41 @@ def func_Insert_In_tblStreet(df_data, db_connection):
     mycursor.close()
 
 
+df_adr_tail = df_table_adress_Station.tail()
+print(df_adr_tail[["city","postCode","country"]])
+
 func_Insert_In_tblStreet(df_table_adress_Operator, mydb)
-#func_Insert_In_tblStreet(df_table_adress_Station, mydb)
+func_Insert_In_tblStreet(df_table_adress_Station, mydb)
+
+
+#print(df_table_adress_Station[df_table_adress_Station["city"] == "ALKOVEN"])
+
 
 print('-#-#-#-#-')
 
-print(df_table_adress_Station)
-
-"""
-for i in range(df_table_adress_Operator.shape[0]):
-    data_row = df_table_adress_Operator.iloc[i,:]
-
-    pC = data_row["postCode"]
-    City = data_row["city"]
-    land = data_row["country"]
-    data_street = data_row["street"]
-
-    #print(myresult_Street)
-    ## Here we check if we get a NULL from the API or if PLZ/City are switched
-    if(City is None or pC is None):
-        obj_street = Street(country=land,postCode=None,location=None,street=None)
-        sql = "SELECT PLZ_ID FROM tbl_plz WHERE city IS NULL AND postCode IS NULL"
-        mycursor.execute(sql)
-        myresult_Street = mycursor.fetchall()
-
-    else:
-        
-        try:
-            testpC = int(pC)
-        except ValueError:
-            testpC="Nichtmoeglich"
-
-        if(isinstance(testpC,int)):
-            obj_street = Street(country=land,postCode=pC,location=City,street=data_street)
-
-            sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
-            val = (obj_street.location, obj_street.postCode, obj_street.country)
-            mycursor.execute(sql,val)
-            myresult_Street = mycursor.fetchall()
-
-        else:
-            obj_street = Street(country=land,postCode=City,location=pC,street=data_street)
-            print("Umgedreht")
-            
-            sql = "SELECT PLZ_ID FROM tbl_plz WHERE city=%s AND postCode=%s AND country=%s"
-            val = (obj_street.location, obj_street.postCode, obj_street.country)
-            mycursor.execute(sql,val)
-            myresult_Street = mycursor.fetchall()
-
-    print(myresult_Street[0][0])
-    del(obj_street)
-"""
-
-
-#print(df_table_adress_Operator)
-#print(df_table_adress_Operator.tail(5))
-
-
-"""
-    if(len(myresult_Street) != 0):
-        print(myresult_Street)
-    else:
-        #Weil leider teilweise PLZ und City umgedreht
-        sql = "SELECT PLZ_ID FROM tbl_plz WHERE city={p} and postCode={ci} and country={c} order by city".format(ci=obj_street.location, p=obj_street.postCode,c=obj_street.country)
-        mycursor.execute(sql)
-        myresult_Street = mycursor.fetchall()
-        print("Umgedreht")
-        print(myresult_Street)
-    """
-
-
-#print(df_table_adress_Operator)                #--> here are all operators with streetvalue
-#print(df_table_adress_Station)                 #--> here are all operators with streetvalue
+#print(df_table_adress_Station)
 
 
 #endregion
+
+
+
+
+##################################################################################################################################################################
+""" START with the Operator Filling in the SQL-DataBase """
+##################################################################################################################################################################
+
+#region FILL other SQL-DataBases
+
+df_API_Operator_AUT = requests.get(url_AT, headers=headers, auth=auth).json() #only AUT
+df_API_Operator_AUT_DataFrame = json_normalize(df_API_Operator_AUT)
+
+header_info_df_Operator = (df_API_Operator_AUT_DataFrame.columns)
+
+#endregion
+
+
+
+
+
+
