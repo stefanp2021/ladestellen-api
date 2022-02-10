@@ -128,38 +128,56 @@ class Station:
     operater_id):
         self.stationId = stationId
         self.stationStatus = stationStatus
-        self.label = label,
+        self.label = label
         self.description = description
         self.postCode = postCode
         self.city = city
         self.street=street
-        self.latitude=latitude
-        self.longitude = longitude
+        self.latitude= str(latitude)
+        self.longitude = str(longitude)
         self.contactName = contactName
         self.telephone = telephone
         self.email = email
         self.directions=directions
         self.website = website
-        self.greenEnergy = greenEnergy
-        self.freeParking = freeParking
+        self.greenEnergy = str(greenEnergy)
+        self.freeParking = str(freeParking)
         self.priceUrl = priceUrl
-        self.public = public
+        self.public = str(public)
         self.openingHours = openingHours
-        self.openingHoursdetails = openingHoursdetails
+        self.openingHoursdetails = ""#openingHoursdetails
         self.operater_id = operater_id
         self.Operator_ID = ""
         self.StreetID = ""
 
 
-    def InsertSQLStation(self,connector):
+    def UpdateSQLStation(self,connector):
         mycursor = connector.cursor()
-        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours.text,openingHours.details) VALUES (%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s,%s)"
-
-        val = (self.stationId, self.operator_Id, self.stationStatus, self.label, self.description, self.StreetID,self.latitude,self.longitude, 
-        self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,
-        self.public,self.openingHours,self.openingHoursdetails,self.Operater_id)
+        sql = "UPDATE tbl_stations SET operator_Id=%s,stationStatus=%s,label=%s,description=%s, address_Id=%s,latitude=%s,longitude=%s,contactName=%s,telephone=%s,email=%s,website=%s,directions=%s,greenEnergy=%s, freeParking=%s, priceUrl=%s, public=%s  WHERE stationId=%s"
+        val = (self.Operator_ID, self.stationStatus, self.label, self.description ,self.StreetID, self.latitude, self.longitude,self.contactName, self.telephone, self.email,
+        self.website, self.directions, self.greenEnergy, self.freeParking, self.priceUrl, self.public, self.stationId)
         mycursor.execute(sql,val)
         connector.commit()
+
+    def InsertSQLStation(self,connector):
+        mycursor = connector.cursor()
+        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public) VALUES (%s, %s,%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s)"
+        #print(sql)
+        val = (self.stationId, self.Operator_ID, self.stationStatus, self.label, self.description, self.StreetID,self.latitude,self.longitude, 
+        self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,
+        self.public)
+        mycursor.execute(sql,val)
+        connector.commit()
+
+    def AskCountOperator(self, connector):
+            mycursor = connector.cursor()
+
+            sql = "SELECT COUNT(*) FROM tbl_stations WHERE stationId = %s"
+            val = (self.stationId,)
+            mycursor.execute(sql,val)
+            myresult_count = mycursor.fetchall()
+            connector.commit()
+            return(myresult_count)
 
     def ReturnStreetID(self, connector):
         mycursor = connector.cursor()
@@ -173,9 +191,20 @@ class Station:
             val_streetid = (self.street,)
             mycursor.execute(sql_streetid,val_streetid)
             myresult_StreetID = mycursor.fetchall()
+            #print(myresult_StreetID)
             connector.commit()
-            
+
         return(myresult_StreetID)
+
+    def ReturnOperatorID(self, connector):
+        mycursor = connector.cursor()
+        sql_operatorid = "SELECT Operator_ID FROM tbl_operators WHERE operatorId=%s"
+        val_operatorid = (self.operater_id,)
+        mycursor.execute(sql_operatorid,val_operatorid)
+        myresult_OperatorID = mycursor.fetchall()
+        connector.commit()
+                
+        return(myresult_OperatorID)
 
     def __del__(self):
         pass

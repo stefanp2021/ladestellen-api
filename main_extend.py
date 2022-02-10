@@ -5,6 +5,7 @@ from logging import PlaceHolder
 from importlib.metadata import metadata
 import json
 import string
+from traceback import print_tb
 from pymysql import NULL
 from requests.auth import HTTPBasicAuth
 import requests
@@ -57,18 +58,19 @@ df_API_Operator_AUT_DataFrame = json_normalize(df_API_Operator_AUT)
 header_info_df_Operator = (df_API_Operator_AUT_DataFrame.columns)
 get_operatorId_AT = list(df_API_Operator_AUT_DataFrame[header_info_df_Operator[0]])
 
-df_shape_API_Operator_AUT_DataFrame = df_API_Operator_AUT_DataFrame.shape[0]
+df_shape_API_Operator_AUT = df_API_Operator_AUT_DataFrame.shape[0]
 
 def func_dump(obj):
     for attr in dir(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
-for i in range(df_shape_API_Operator_AUT_DataFrame):
 
-    print(i)
-    print('-----')
+
+for i in range(df_shape_API_Operator_AUT):
 
     df_API_Operator_Single = df_API_Operator_AUT_DataFrame.iloc[i,:]
+
+    #print('-----')
 
     #print(df_API_Operator_Single)
     OperatorId = df_API_Operator_Single[header_info_df_Operator[0]]
@@ -94,26 +96,34 @@ for i in range(df_shape_API_Operator_AUT_DataFrame):
 
     ###Insert into tbl_Operator in SQL if not exist else update
     Street_Op_Id = obj_Operator.ReturnStreetID(mydb)
-    obj_Operator.StreetID = Street_Op_Id[0][0]
-    #print(obj_Operator.StreetID)
+    #print(Street_Op_Id)
 
+    obj_Operator.StreetID = int(Street_Op_Id[0][0])
+    #print(obj_Operator.StreetID)
     #func_dump(obj_Operator)
     #print('-----------')
 
     count_obj_Operator = obj_Operator.AskCountOperator(mydb)
+
     if(count_obj_Operator[0][0] <1):
         obj_Operator.InsertSQLOperator(mydb)
     else:
         obj_Operator.UpdateSQLOperator(mydb)
 
-
+    #print("----------------------------------------------------------")
     del obj_Operator
 
-#endregion
 
 mydb.close()
 
 
+
+##################################################################################################################################################################
+"""START with the Station Filling in the SQL-DataBase""" 
+##################################################################################################################################################################
+
+
+print("Finished with Operators, now start with Stations")
 
 mydb = mysql.connector.connect(
         host="dev.muenzer.at",
@@ -123,45 +133,68 @@ mydb = mysql.connector.connect(
     )
 
 
-##################################################################################################################################################################
-""" START with the Station Filling in the SQL-DataBase """
-##################################################################################################################################################################
+for i in range(len(get_operatorId_AT)):
 
-#region
-
-for i in get_operatorId_AT:
-    urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(i))
+    operator_short =  get_operatorId_AT[i]
+    urlstation = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators/{operator_id}/stations'.format(cAT = countryID_AT,operator_id=str(operator_short))
 
     data_op_LS = requests.get(urlstation, headers=headers, auth=auth).json()
     df_API_Station_AUT_DataFrame = json_normalize(data_op_LS)
     header_Station_AUT_DataFrame = list(df_API_Station_AUT_DataFrame.columns)
+    #print(header_Station_AUT_DataFrame)
+    for j in range(len(df_API_Station_AUT_DataFrame)):
+            
+        df_API_Station_Single = df_API_Station_AUT_DataFrame.iloc[j,:]
 
-    df_API_Station_Single = df_API_Station_AUT_DataFrame.iloc[i,:]
+        #print(df_API_Station_Single)
 
-    Stationid = df_API_Station_Single[header_Station_AUT_DataFrame[0]]
-    StationStatus = df_API_Station_Single[header_Station_AUT_DataFrame[1]]
-    Label = df_API_Station_Single[header_Station_AUT_DataFrame[2]]
-    Description = df_API_Station_Single[header_Station_AUT_DataFrame[3]]
-    PostCode = df_API_Station_Single[header_Station_AUT_DataFrame[4]]
-    City = df_API_Station_Single[header_Station_AUT_DataFrame[5]]
-    Streetdata = df_API_Station_Single[header_Station_AUT_DataFrame[6]]
-    Latitude = df_API_Station_Single[header_Station_AUT_DataFrame[7]]
-    Longitude = df_API_Station_Single[header_Station_AUT_DataFrame[8]]
-    ContactName = df_API_Station_Single[header_Station_AUT_DataFrame[9]]
-    Telephone = df_API_Station_Single[header_Station_AUT_DataFrame[10]]
-    Email = df_API_Station_Single[header_Station_AUT_DataFrame[11]]
-    Website = df_API_Station_Single[header_Station_AUT_DataFrame[12]]
-    Directions= df_API_Station_Single[header_Station_AUT_DataFrame[13]]
-    GreenEnergy= df_API_Station_Single[header_Station_AUT_DataFrame[14]]
-    FreeParking= df_API_Station_Single[header_Station_AUT_DataFrame[15]]
-    PriceUrl= df_API_Station_Single[header_Station_AUT_DataFrame[16]]
-    Public= df_API_Station_Single[header_Station_AUT_DataFrame[17]]
-    OpeningHours_text= df_API_Station_Single[header_Station_AUT_DataFrame[18]]
-    OpeningHours_details= df_API_Station_Single[header_Station_AUT_DataFrame[19]]
+        Stationid = df_API_Station_Single[header_Station_AUT_DataFrame[0]]
+        StationStatus = df_API_Station_Single[header_Station_AUT_DataFrame[1]]
+        Label = df_API_Station_Single[header_Station_AUT_DataFrame[2]]
+        Description = df_API_Station_Single[header_Station_AUT_DataFrame[3]]
+        PostCode = df_API_Station_Single[header_Station_AUT_DataFrame[4]]
+        City = df_API_Station_Single[header_Station_AUT_DataFrame[5]]
+        Streetdata = df_API_Station_Single[header_Station_AUT_DataFrame[6]]
+        Latitude = df_API_Station_Single[header_Station_AUT_DataFrame[7]]
+        Longitude = df_API_Station_Single[header_Station_AUT_DataFrame[8]]
+        ContactName = df_API_Station_Single[header_Station_AUT_DataFrame[9]]
+        Telephone = df_API_Station_Single[header_Station_AUT_DataFrame[10]]
+        Email = df_API_Station_Single[header_Station_AUT_DataFrame[11]]
+        Website = df_API_Station_Single[header_Station_AUT_DataFrame[12]]
+        Directions= df_API_Station_Single[header_Station_AUT_DataFrame[13]]
+        GreenEnergy= df_API_Station_Single[header_Station_AUT_DataFrame[14]]
+        FreeParking= df_API_Station_Single[header_Station_AUT_DataFrame[15]]
+        PriceUrl= df_API_Station_Single[header_Station_AUT_DataFrame[16]]
+        Public= df_API_Station_Single[header_Station_AUT_DataFrame[17]]
+        OpeningHours_text= df_API_Station_Single[header_Station_AUT_DataFrame[18]]
+        OpeningHours_details= df_API_Station_Single[header_Station_AUT_DataFrame[19]]
 
-    obj_Station = Station(stationId=Stationid, stationStatus=StationStatus,label=Label,description=Description,postCode=PostCode,city=City,
-    street=StreetData,latitude=Latitude,longitude=Longitude,contactName=ContactName,telephone=Telephone,email=Email,website=Website,directions=Directions,
-    greenEnergy=GreenEnergy,freeParking=FreeParking,priceUrl=PriceUrl,public=Public,openingHours=OpeningHours_text,openingHoursdetails=OpeningHours_details,operater_id=str(i))
+        obj_Station = Station(stationId=Stationid, stationStatus=StationStatus,label=Label,description=Description,postCode=PostCode,city=City,
+        street=Streetdata,latitude=Latitude,longitude=Longitude,contactName=ContactName,telephone=Telephone,email=Email,website=Website,directions=Directions,
+        greenEnergy=GreenEnergy,freeParking=FreeParking,priceUrl=PriceUrl,public=Public,openingHours=OpeningHours_text,openingHoursdetails=OpeningHours_details,operater_id=str(operator_short))
+
+        Street_Op_Id = obj_Station.ReturnStreetID(mydb)
+        #print(Street_Op_Id)
+        obj_Station.StreetID = Street_Op_Id[0][0]
+
+        Operator_Station_Id = obj_Station.ReturnOperatorID(mydb)
+        obj_Station.Operator_ID = Operator_Station_Id[0][0]
 
 
+        count_obj_Stations = obj_Station.AskCountOperator(mydb)
+
+        #func_dump(obj_Station)
+
+        #func_dump(obj_Station)
+        #print('---------------------------------------')
+        if(count_obj_Stations[0][0] < 1):
+            #func_dump(obj_Station)
+            obj_Station.InsertSQLStation(mydb)
+        else:
+            obj_Station.UpdateSQLStation(mydb)
+
+
+        del obj_Station
+
+print("Finished with Stations")
 #endregion
