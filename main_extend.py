@@ -1,5 +1,8 @@
 
 
+"""  Das hier ist nicht nötig  """
+
+"""
 from lib2to3.pytree import convert
 from logging import PlaceHolder
 from importlib.metadata import metadata
@@ -19,7 +22,7 @@ import copy
 from sqlalchemy import null
 
 #import Object
-from Object import Operator, Station, Street
+from Object import Operator, Station, OCountry
 
 
 ##############################################  BLOCK Basic Values  ########################################################
@@ -47,7 +50,7 @@ mydb = mysql.connector.connect(
 
 
 ##################################################################################################################################################################
-""" START with the Operator Filling in the SQL-DataBase """
+# START with the Operator Filling in the SQL-DataBase 
 ##################################################################################################################################################################
 
 #region FILL other SQL-DataBases
@@ -119,7 +122,7 @@ mydb.close()
 
 
 ##################################################################################################################################################################
-"""START with the Station Filling in the SQL-DataBase""" 
+ # START with the Station Filling in the SQL-DataBase
 ##################################################################################################################################################################
 
 
@@ -198,3 +201,4 @@ for i in range(len(get_operatorId_AT)):
 
 print("Finished with Stations")
 #endregion
+"""
