@@ -7,6 +7,15 @@ from turtle import st
 
 from sqlalchemy import true
 
+def func_GetRidofNone(wert):
+    if((wert is None) or (wert == "Null") or (wert=="NULL") or (wert == "None") or (wert == "NONE")):
+        wert=""
+        return(wert)
+    else:
+        return(wert)
+
+
+
 class OCountry:
     species = "Country Name"
 
@@ -208,7 +217,7 @@ class Operator:
         self.StreetID = ""
         self.PLZID=""
         self.TypeID=""
-        self.OLabel = "{o} {f} {l}".format(o = self.organization, f=self.firstName, l=self.lastName)
+        self.OLabel = "{o} {f} {l}".format(o = func_GetRidofNone(self.organization), f=func_GetRidofNone(self.firstName), l=func_GetRidofNone(self.lastName))
         #if(self.operatorcode == "MOO"):
         #    print(self.postCode, self.city,self.street)
     
