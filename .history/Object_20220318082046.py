@@ -26,7 +26,7 @@ class OCountry:
         mycursor = connector.cursor()
         
         sql_country = "SELECT COUNT(*) FROM tbl_country WHERE CountryName =%s" # "SELECT * FROM tbl_addr WHERE street IS NULL" 
-        val_country = (self.country,)
+        val_country = (self.countryname,)
         mycursor.execute(sql_country,val_country)
         myresult_country = mycursor.fetchall()
         connector.commit()
@@ -258,7 +258,7 @@ class Operator:
     def ReturnStreetID(self, connector):
         mycursor = connector.cursor()
         
-        sql_streetid = "SELECT Address_ID FROM tbl_addr WHERE (street=%s or street IS NULL)"
+        sql_streetid = "SELECT Adress_ID FROM tbl_addr WHERE (street=%s or street IS NULL)"
         val_streetid = (self.street,)
         mycursor.execute(sql_streetid,val_streetid)
         myresult_StreetID = mycursor.fetchall()
@@ -368,13 +368,13 @@ class Station:
     def ReturnStreetID(self, connector):
         mycursor = connector.cursor()
         if(self.street is None):
-            sql_streetid = "SELECT Address_ID FROM tbl_addr WHERE street IS NULL AND Plz_Id=%s"
+            sql_streetid = "SELECT Adress_ID FROM tbl_addr WHERE street IS NULL AND Plz_Id=%s"
             val_street = (self.PLZID,)
             mycursor.execute(sql_streetid,val_street)
             myresult_StreetID = mycursor.fetchall()
             connector.commit()
         else:
-            sql_streetid = "SELECT Address_ID FROM tbl_addr WHERE street=%s AND Plz_Id=%s"
+            sql_streetid = "SELECT Adress_ID FROM tbl_addr WHERE street=%s AND Plz_Id=%s"
             val_streetid = (self.street,self.PLZID)
             mycursor.execute(sql_streetid,val_streetid)
             myresult_StreetID = mycursor.fetchall()
