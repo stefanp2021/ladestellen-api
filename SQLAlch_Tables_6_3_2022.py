@@ -57,6 +57,16 @@ Session = sessionmaker()
 
 # Now we create the Database
 
+
+
+
+
+
+
+
+
+
+
 #docs.sqlalchemy.org/en/14/orm/tutorial.html
 
 
