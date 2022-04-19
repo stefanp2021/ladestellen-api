@@ -26,7 +26,7 @@ import sys
 import tqdm
 from tqdm import tqdm 
 
-from sqlalchemy import column, null
+#from sqlalchemy import column, null
 from Object import Operator, Station, Street, OCountry, PLZ_Location, OType
 
 
