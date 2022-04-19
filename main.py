@@ -27,7 +27,7 @@ import tqdm
 from tqdm import tqdm 
 
 #from sqlalchemy import column, null
-from Object import Operator, Station, Street, OCountry, PLZ_Location, OType
+from sqlobject import Operator, Station, Street, OCountry, PLZ_Location, OType
 
 
 ##############################################  BLOCK Basic Values  ########################################################
