@@ -26,8 +26,8 @@ import sys
 import tqdm
 from tqdm import tqdm 
 
-#from sqlalchemy import column, null
-from sqlobject import Operator, Station, Street, OCountry, PLZ_Location, OType
+from sqlalchemy import column, null
+from Object import Operator, Station, Street, OCountry, PLZ_Location, OType
 
 
 ##############################################  BLOCK Basic Values  ########################################################
@@ -137,7 +137,7 @@ def func_fillObjectStreet(Splz, Slocation, Sstreet):
 # Connection to Database
 
 mydb = mysql.connector.connect(
-        host="192.168.10.21",
+        host="dev.muenzer.at",
         user="ladestellen",
         password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
         database="ladestellen"

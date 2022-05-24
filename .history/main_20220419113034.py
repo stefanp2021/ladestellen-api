@@ -137,7 +137,7 @@ def func_fillObjectStreet(Splz, Slocation, Sstreet):
 # Connection to Database
 
 mydb = mysql.connector.connect(
-        host="192.168.10.21",
+        host="web.muenzer-internatioal.com",
         user="ladestellen",
         password ="ybV1NfB0sCrzWS22hzOiMZ7YwkmtIwMT",
         database="ladestellen"
