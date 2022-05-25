@@ -3,7 +3,7 @@
 
 
 from itertools import count
-#from turtle import st
+from turtle import st
 
 #from sqlalchemy import true
 
