@@ -26,7 +26,7 @@ import keyring
 
 import tqdm
 from tqdm import tqdm 
-import password
+import password.py
 #from sqlalchemy import column, null
 from sqlobject import Operator, Station, Street, OCountry, PLZ_Location, OType
 
@@ -176,7 +176,6 @@ url = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators'.format(cAT
 
 headers = {'Accept': 'application/json',}
 pw=password.getbasicauth()
-print(pw)
 auth = HTTPBasicAuth('stefanpirker', pw,)
 
 ##################################################################################################################################################################
