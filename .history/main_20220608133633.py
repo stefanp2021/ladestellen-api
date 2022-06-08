@@ -22,10 +22,11 @@ from dataclasses import dataclass
 import mysql.connector
 import copy
 import sys
-#import security.py
+import security.py
 #from keyring import get_keyring
 import tqdm
 from tqdm import tqdm 
+import password
 #from sqlalchemy import column, null
 from sqlobject import Operator, Station, Street, OCountry, PLZ_Location, OType
 
@@ -174,7 +175,7 @@ url = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators'.format(cAT
 
 
 headers = {'Accept': 'application/json',}
-pw='xWQ24m2z3AqKP4HcarZz'
+pw=xWQ24m2z3AqKP4HcarZz
 print(pw)
 auth = HTTPBasicAuth('stefanpirker', pw,)
 

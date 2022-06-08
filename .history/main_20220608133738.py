@@ -174,7 +174,7 @@ url = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators'.format(cAT
 
 
 headers = {'Accept': 'application/json',}
-pw='xWQ24m2z3AqKP4HcarZz'
+pw=xWQ24m2z3AqKP4HcarZz
 print(pw)
 auth = HTTPBasicAuth('stefanpirker', pw,)
 
