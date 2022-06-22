@@ -296,7 +296,7 @@ class Operator:
 class Station:
     species = "Station Values"
     def __init__(self,stationId,stationStatus,label,description,postCode,city,street,latitude,longitude,
-    contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,openingHours,openingHoursdetails,
+    contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,DateTime,openingHours,openingHoursdetails,
     operater_id):
         self.stationId = stationId
         self.stationStatus = stationStatus
@@ -316,6 +316,7 @@ class Station:
         self.freeParking = str(freeParking)
         self.priceUrl = priceUrl
         self.public = str(public)
+        self.DateT = str(DateTime)
         self.openingHours = openingHours
         self.openingHoursdetails = ""#openingHoursdetails
         self.operater_id = operater_id
@@ -327,20 +328,20 @@ class Station:
     def UpdateSQLStation(self,connector):
         mycursor = connector.cursor()
         #print("UPDATE STATION {}".format(self.StreetID))
-        sql = "UPDATE tbl_stations SET stationStatus=%s,label=%s,description=%s,latitude=%s,longitude=%s,contactName=%s,telephone=%s,email=%s,website=%s,directions=%s,greenEnergy=%s, freeParking=%s, priceUrl=%s, public=%s  WHERE stationId=%s AND address_Id=%s AND operator_Id=%s"
+        sql = "UPDATE tbl_stations SET stationStatus=%s,label=%s,description=%s,latitude=%s,longitude=%s,contactName=%s,telephone=%s,email=%s,website=%s,directions=%s,greenEnergy=%s, freeParking=%s, priceUrl=%s, public=%s, DateTime=%s  WHERE stationId=%s AND address_Id=%s AND operator_Id=%s"
         val = (self.stationStatus, self.label, self.description , self.latitude, self.longitude,self.contactName, self.telephone, self.email,
-        self.website, self.directions, self.greenEnergy, self.freeParking, self.priceUrl, self.public, self.stationId, self.StreetID, self.Operator_ID)
+        self.website, self.directions, self.greenEnergy, self.freeParking, self.priceUrl, self.public, self.DateT, self.stationId, self.StreetID, self.Operator_ID)
         mycursor.execute(sql,val)
         connector.commit()
 
     def InsertSQLStation(self,connector):
         mycursor = connector.cursor()
         #print("INSERT STATION {} should be Id".format(self.StreetID))
-        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public) VALUES (%s, %s,%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s)"
+        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,DateTime ) VALUES (%s, %s, %s,%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s)"
         #print(sql)
         val = (self.stationId, self.Operator_ID, self.stationStatus, self.label, self.description, self.StreetID,self.latitude,self.longitude, 
         self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,
-        self.public)
+        self.public, self.DateT)
         mycursor.execute(sql,val)
         connector.commit()
 
