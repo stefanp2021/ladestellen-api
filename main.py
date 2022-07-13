@@ -79,6 +79,9 @@ StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPubli
     Operator_Station_Id = obj_Station.ReturnOperatorID(mydb)
     obj_Station.Operator_ID = Operator_Station_Id[0][0]
 
+    Status_Station_ID = obj_Station.ReturnStatusID(mydb)
+    obj_Station.StatusID = Status_Station_ID[0][0]
+
     count_obj_Stations = obj_Station.AskCountStation(mydb)
 
     #func_dump(obj_Station)
@@ -365,6 +368,29 @@ print('#########################################################################
 
 
 
+## Now all Stations to inactive and 
+
+
+mycursor =  mydb.cursor()
+sql_statinact = "SELECT Status_ID FROM tbl_status WHERE (Status=%s)"
+val_inactv = ("INACTIVE",)
+mycursor.execute(sql_statinact,val_inactv)
+inactive_value_id_all = mycursor.fetchall()[0][0]
+mydb.commit()
+mycursor.close()
+
+print(inactive_value_id_all)
+
+
+
+
+mycursor = mydb.cursor()
+sql_status_inactive = "UPDATE tbl_stations SET stationStatus=%s"
+val_status_inactive = (inactive_value_id_all,)
+mycursor.execute(sql_status_inactive,val_status_inactive)
+myresult_country = mycursor.fetchall()
+mydb.commit()
+mycursor.close()
 
 
 
@@ -373,7 +399,6 @@ print('#########################################################################
 # But first we need a base-Construct which we can fill with the requested API now
 
 waste_op_id = []
-
 country_fill = countryID[0]
 
 #get_operatorId_test = get_operatorId[:5]
