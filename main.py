@@ -1,3 +1,4 @@
+#### latest!
 ##############################################  BLOCK Package  ########################################################
 
 
@@ -29,6 +30,10 @@ from tqdm import tqdm
 #from sqlalchemy import column, null
 from sqlobject import Operator, Station, Street, OCountry, PLZ_Location, OType
 
+import datetime
+from datetime import datetime
+from datetime import timedelta
+
 
 ##############################################  BLOCK Basic Values  ########################################################
 
@@ -49,11 +54,11 @@ def func_iterateLists(takelist):
 
 
 def func_fillObjectStation(StStationId, StStationStatus, StLabel, StDescription, StPostCode, StCity,StStreetdata,StLatitiude,StLongitude,StContactName,StTelephone,
-StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPublic,StOpeningHours_text,StOpeningHours_details,StoperatorId):
+StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPublic,StDateTime,StOpeningHours_text,StOpeningHours_details,StoperatorId):
     #To fill the Station-Object
     obj_Station = Station(stationId=StStationId, stationStatus=StStationStatus,label=StLabel,description=StDescription,postCode=StPostCode,city=StCity,
     street=StStreetdata,latitude=StLatitiude,longitude=StLongitude,contactName=StContactName,telephone=StTelephone,email=StEmail,website=StWebsite,directions=StDirections,
-    greenEnergy=StGreenEnergy,freeParking=StFreeParking,priceUrl=StPriceUrl,public=StPublic,openingHours=StOpeningHours_text,openingHoursdetails=StOpeningHours_details,operater_id=StoperatorId)
+    greenEnergy=StGreenEnergy,freeParking=StFreeParking,priceUrl=StPriceUrl,public=StPublic,DateTime=StDateTime,openingHours=StOpeningHours_text,openingHoursdetails=StOpeningHours_details,operater_id=StoperatorId)
 
     PLZ_Station_Id = obj_Station.ReturnPLZID(mydb)
     obj_Station.PLZID = PLZ_Station_Id[0][0]
@@ -74,6 +79,9 @@ StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPubli
 
     Operator_Station_Id = obj_Station.ReturnOperatorID(mydb)
     obj_Station.Operator_ID = Operator_Station_Id[0][0]
+
+    Status_Station_ID = obj_Station.ReturnStatusID(mydb)
+    obj_Station.StatusID = Status_Station_ID[0][0]
 
     count_obj_Stations = obj_Station.AskCountStation(mydb)
 
@@ -175,7 +183,7 @@ url = 'https://api.e-control.at/charge/1.0/countries/{cAT}/operators'.format(cAT
 
 headers = {'Accept': 'application/json',}
 pw='xWQ24m2z3AqKP4HcarZz'
-print(pw)
+#print(pw)
 auth = HTTPBasicAuth('stefanpirker', pw,)
 
 ##################################################################################################################################################################
@@ -269,6 +277,8 @@ except:
 print(" Finished Reading API-Operator: Now we go through each one to start filling the sql")
 
 
+actual_dateTime = datetime.now().isoformat(sep=' ', timespec='milliseconds')
+
 ##########################################################################################
 #######                 NOW we can start with filling the SQL_table --> tbl_Plz, tbl_Street, tbl_country, tbl_Operator
 #
@@ -359,6 +369,29 @@ print('#########################################################################
 
 
 
+## Now all Stations to inactive and 
+
+
+mycursor =  mydb.cursor()
+sql_statinact = "SELECT Status_ID FROM tbl_status WHERE (Status=%s)"
+val_inactv = ("INACTIVE",)
+mycursor.execute(sql_statinact,val_inactv)
+inactive_value_id_all = mycursor.fetchall()[0][0]
+mydb.commit()
+mycursor.close()
+
+print(inactive_value_id_all)
+
+
+
+
+mycursor = mydb.cursor()
+sql_status_inactive = "UPDATE tbl_stations SET stationStatus=%s"
+val_status_inactive = (inactive_value_id_all,)
+mycursor.execute(sql_status_inactive,val_status_inactive)
+myresult_country = mycursor.fetchall()
+mydb.commit()
+mycursor.close()
 
 
 
@@ -367,7 +400,6 @@ print('#########################################################################
 # But first we need a base-Construct which we can fill with the requested API now
 
 waste_op_id = []
-
 country_fill = countryID[0]
 
 #get_operatorId_test = get_operatorId[:5]
@@ -446,7 +478,7 @@ for k in tqdm(range(len(get_operatorId))):
 
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
-                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StOpeningHours_text=OpeningHours_text,
+                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public, StDateTime = actual_dateTime ,StOpeningHours_text=OpeningHours_text,
                 StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
 
 
@@ -478,7 +510,7 @@ for k in tqdm(range(len(get_operatorId))):
 
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
-                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StOpeningHours_text=OpeningHours_text,
+                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public, StDateTime = actual_dateTime,StOpeningHours_text=OpeningHours_text,
                 StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
 
 
@@ -504,7 +536,7 @@ for k in tqdm(range(len(get_operatorId))):
                 
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
-                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StOpeningHours_text=OpeningHours_text,
+                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StDateTime=actual_dateTime,StOpeningHours_text=OpeningHours_text,
                 StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
 
 
@@ -528,7 +560,7 @@ for k in tqdm(range(len(get_operatorId))):
                 
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
-                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StOpeningHours_text=OpeningHours_text,
+                StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StDateTime = actual_dateTime,StOpeningHours_text=OpeningHours_text,
                 StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
 
 
