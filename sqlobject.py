@@ -319,7 +319,7 @@ class Station:
     species = "Station Values"
     def __init__(self,stationId,stationStatus,label,description,postCode,city,street,latitude,longitude,
     contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,DateTime,openingHours,openingHoursdetails,
-    operater_id):
+    operater_id, FirstInsertTime):
         self.stationId = stationId
         self.stationStatus = stationStatus
         self.label = label
@@ -346,6 +346,7 @@ class Station:
         self.StreetID = ""
         self.PLZID=""
         self.StatusID=""
+        self.InsertTime = FirstInsertTime
 
 
     def UpdateSQLStation(self,connector):
@@ -360,11 +361,11 @@ class Station:
     def InsertSQLStation(self,connector):
         mycursor = connector.cursor()
         #print("INSERT STATION {} should be Id".format(self.StreetID))
-        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,DateTime ) VALUES (%s, %s, %s,%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s)"
+        sql = "INSERT INTO tbl_stations (stationId, operator_Id, stationStatus,label,description,address_Id,latitude,longitude,contactName,telephone,email,website,directions,greenEnergy,freeParking,priceUrl,public,DateTime, FirstInsertTime) VALUES (%s, %s, %s,%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s,%s,%s, %s,%s, %s)"
         #print(sql)
         val = (self.stationId, self.Operator_ID, self.StatusID, self.label, self.description, self.StreetID,self.latitude,self.longitude, 
         self.contactName,self.telephone,self.email, self.website,self.directions,self.greenEnergy,self.freeParking,self.priceUrl,
-        self.public, self.DateT)
+        self.public, self.DateT, self.InsertTime)
         mycursor.execute(sql,val)
         connector.commit()
 
