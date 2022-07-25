@@ -54,11 +54,12 @@ def func_iterateLists(takelist):
 
 
 def func_fillObjectStation(StStationId, StStationStatus, StLabel, StDescription, StPostCode, StCity,StStreetdata,StLatitiude,StLongitude,StContactName,StTelephone,
-StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPublic,StDateTime,StOpeningHours_text,StOpeningHours_details,StoperatorId):
+StEmail,StWebsite,StDirections,StGreenEnergy, StFreeParking, StPriceUrl, StPublic,StDateTime,StOpeningHours_text,StOpeningHours_details,StoperatorId,StFirstInsert):
     #To fill the Station-Object
     obj_Station = Station(stationId=StStationId, stationStatus=StStationStatus,label=StLabel,description=StDescription,postCode=StPostCode,city=StCity,
     street=StStreetdata,latitude=StLatitiude,longitude=StLongitude,contactName=StContactName,telephone=StTelephone,email=StEmail,website=StWebsite,directions=StDirections,
-    greenEnergy=StGreenEnergy,freeParking=StFreeParking,priceUrl=StPriceUrl,public=StPublic,DateTime=StDateTime,openingHours=StOpeningHours_text,openingHoursdetails=StOpeningHours_details,operater_id=StoperatorId)
+    greenEnergy=StGreenEnergy,freeParking=StFreeParking,priceUrl=StPriceUrl,public=StPublic,DateTime=StDateTime,openingHours=StOpeningHours_text,
+    openingHoursdetails=StOpeningHours_details,operater_id=StoperatorId,FirstInsertTime=StFirstInsert)
 
     PLZ_Station_Id = obj_Station.ReturnPLZID(mydb)
     obj_Station.PLZID = PLZ_Station_Id[0][0]
@@ -380,7 +381,20 @@ inactive_value_id_all = mycursor.fetchall()[0][0]
 mydb.commit()
 mycursor.close()
 
-print(inactive_value_id_all)
+#print(inactive_value_id_all)
+
+
+
+#####       Am Anfang einmal alle die bei Insert die Null haben den update datum einfügen        ############
+mycursor =  mydb.cursor()
+sql_statfirstD = "UPDATE tbl_stations SET FirstInsertTime=%s WHERE FirstInsertTime is NULL"
+val_statfirstD = (actual_dateTime,)
+mycursor.execute(sql_statfirstD,val_statfirstD)
+myresult_firstDate = mycursor.fetchall()
+mydb.commit()
+mycursor.close()
+#print(inactive_value_id_all)
+####
 
 
 
@@ -479,7 +493,7 @@ for k in tqdm(range(len(get_operatorId))):
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
                 StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public, StDateTime = actual_dateTime ,StOpeningHours_text=OpeningHours_text,
-                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
+                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID),StFirstInsert=actual_dateTime)
 
 
                 
@@ -511,7 +525,7 @@ for k in tqdm(range(len(get_operatorId))):
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
                 StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public, StDateTime = actual_dateTime,StOpeningHours_text=OpeningHours_text,
-                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
+                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID),StFirstInsert=actual_dateTime)
 
 
 
@@ -537,7 +551,7 @@ for k in tqdm(range(len(get_operatorId))):
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
                 StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StDateTime=actual_dateTime,StOpeningHours_text=OpeningHours_text,
-                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
+                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID), StFirstInsert=actual_dateTime)
 
 
             elif(df_get_iter_item_dfStation[PLZ].isdigit() and df_get_iter_item_dfStation[Ort].isdigit()):
@@ -561,7 +575,7 @@ for k in tqdm(range(len(get_operatorId))):
                 func_fillObjectStation(StStationId=Stationid, StStationStatus=StationStatus, StLabel=Label, StDescription=Description, StPostCode=PostCode,StCity=City,
                 StStreetdata=Streetdata,StLatitiude=Latitude,StLongitude=Longitude,StContactName=ContactName,StTelephone=Telephone,StEmail=Email,StWebsite=Website,StDirections=Directions,
                 StGreenEnergy=GreenEnergy,StFreeParking=FreeParking,StPriceUrl=PriceUrl,StPublic=Public,StDateTime = actual_dateTime,StOpeningHours_text=OpeningHours_text,
-                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID))
+                StOpeningHours_details=OpeningHours_details,StoperatorId=str(get_OID), StFirstInsert=actual_dateTime)
 
 
             else:
