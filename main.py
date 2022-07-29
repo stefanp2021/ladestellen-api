@@ -386,13 +386,13 @@ mycursor.close()
 
 
 #####       Am Anfang einmal alle die bei Insert die Null haben den update datum einfügen        ############
-mycursor =  mydb.cursor()
-sql_statfirstD = "UPDATE tbl_stations SET FirstInsertTime=%s WHERE FirstInsertTime is NULL"
-val_statfirstD = (actual_dateTime,)
-mycursor.execute(sql_statfirstD,val_statfirstD)
-myresult_firstDate = mycursor.fetchall()
-mydb.commit()
-mycursor.close()
+#mycursor =  mydb.cursor()
+#sql_statfirstD = "UPDATE tbl_stations SET FirstInsertTime=%s WHERE FirstInsertTime is NULL"
+#val_statfirstD = (actual_dateTime,)
+#mycursor.execute(sql_statfirstD,val_statfirstD)
+#myresult_firstDate = mycursor.fetchall()
+#mydb.commit()
+#mycursor.close()
 #print(inactive_value_id_all)
 ####
 
